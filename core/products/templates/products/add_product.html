@@ -1,0 +1,113 @@
+{% extends 'chat/base.html' %}
+{% block content %}
+<style>
+    input[type="file"] {
+    display: block !important;
+}
+
+</style>
+
+<div class="container mt-5">
+    <div class="col-md-"></div>
+    <div class="col-md-6">
+    <div class="card shadow-lg p-4">
+        <h2 class="text-center mb-4">Add New Product</h2>
+        <form method="POST" enctype="multipart/form-data" id="productForm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Product Name</label>
+                {{ form.product_name }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                {{ form.product_category }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Measurement</label>
+                {{ form.product_measurement }}
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                {{ form.product_description }}
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Price</label>
+                    {{ form.product_price }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Stock</label>
+                    {{ form.product_stock }}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Main Image</label>
+                {{ form.product_image }}
+                <img id="imagePreview" class="img-thumbnail mt-2" style="max-width: 200px; display: none;" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Additional Image 1</label>
+                {{ form.product_image1 }}
+                <img id="imagePreview1" class="img-thumbnail mt-2" style="max-width: 200px; display: none;" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Additional Image 2</label>
+                {{ form.product_image2 }}
+                <img id="imagePreview2" class="img-thumbnail mt-2" style="max-width: 200px; display: none;" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Additional Image 3</label>
+                {{ form.product_image3 }}
+                <img id="imagePreview3" class="img-thumbnail mt-2" style="max-width: 200px; display: none;" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Additional Image 4</label>
+                {{ form.product_image4 }}
+                <img id="imagePreview4" class="img-thumbnail mt-2" style="max-width: 200px; display: none;" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Add Product</button>
+        </form>
+    </div>
+    </div>
+    <div class="col-md-6"></div>
+</div>
+<div class="mb-5">
+
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        function previewImage(input, previewElement) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    previewElement.src = e.target.result;
+                    previewElement.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        document.querySelector("#id_product_image").addEventListener("change", function() {
+            previewImage(this, document.querySelector("#imagePreview"));
+        });
+        
+        document.querySelector("#id_product_image1").addEventListener("change", function() {
+            previewImage(this, document.querySelector("#imagePreview1"));
+        });
+        
+        document.querySelector("#id_product_image2").addEventListener("change", function() {
+            previewImage(this, document.querySelector("#imagePreview2"));
+        });
+        
+        document.querySelector("#id_product_image3").addEventListener("change", function() {
+            previewImage(this, document.querySelector("#imagePreview3"));
+        });
+        
+        document.querySelector("#id_product_image4").addEventListener("change", function() {
+            previewImage(this, document.querySelector("#imagePreview4"));
+        });
+    });
+</script>
+{% endblock %} 
+
+adjust the width of the form and make all form fields full width
