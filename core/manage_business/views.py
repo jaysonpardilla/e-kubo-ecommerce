@@ -42,7 +42,6 @@ def reject_order(request, order_id):
     order.status = "Rejected"
     order.save()
 
-    # Notify buyer
     Notification.objects.create(
         user=order.buyer,
         message=f"Your order for {order.product.product_name} has been rejected."
@@ -53,6 +52,7 @@ def reject_order(request, order_id):
 def delete_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     product.delete()
+    messages.error(request, 'product deleted!')
     return redirect('manage_business:home')
 
 

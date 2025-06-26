@@ -1,10 +1,13 @@
 {% extends 'chat/base.html' %}
 {% load static %}
-
+{% block title %}
+   <title>E-Kubo: Landing Page</title>
+{% endblock title %}
+<link rel="icon" type="image/png" href="{% static 'icons/ekubo_icon.png' %}">
 {% block content %}
 <!-- Bootstrap 5 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<link rel="stylesheet" href="{% static 'css/slideup.css' %}">
 <style>
    .product-card {
         display: flex;
@@ -79,21 +82,21 @@
 
 <main>
    {% if query %}
-      <section class="my-lg-14 my-8">
+      <section class="my-lg-14 my-8 slide-up">
          <div class="container">
             <div class="row">
-               <div class="col-12 mb-6">
+               <div class="col-12 mb-6" style="font-family: 'Arial', sans-serif;">
                   <h3 class="mb-0"><b>Query Products</b></h3>
                </div>
             </div>
-            <div class="row g-4 row-cols-lg-5 row-cols-2 row-cols-md-3">
+            <div class="row g-4 row-cols-lg-5 row-cols-2 row-cols-md-3" style="font-family: 'Arial', sans-serif;">
                {% if query %}
                {% for products in results %}
                <div class="col">
                   <div class="card card-product">
-                     <div class="card-body">
+                     <div class="slide-up card-body">
                         <div class="text-center position-relative">
-                           <div class="position-absolute top-0 start-0">
+                           <div class="position-absolute top-0 start-0" style="font-family: 'Arial', sans-serif;">
                               <div class="availability">
                                  {% if products.product_stock >= 1 %}
                                     <small class="text-white" style="background-color: #00b200; border-radius: 5px; padding: 2px;">available</small>
@@ -113,7 +116,7 @@
                            </a>
                         </div>
                         <h2 class="fs-6"><a href="pages/shop-single.html" class="text-inherit text-decoration-none">{{products.product_name}}</a></h2>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="d-flex justify-content-between align-items-center mt-3" style="font-family: 'Arial', sans-serif;">
                            <div>
                               <span class="text-dark">₱{{products.product_price}} per {{products.product_measurement}}</span>
                            </div>
@@ -138,11 +141,11 @@
     <div class="container">
        <!-- row -->
        <div class="row">
-          <div class="col-xxl-8 col-xl-7">
+          <div class="col-xxl-8 col-xl-7 ">
              <!-- hero slider -->
              <div class="hero-slider">
-                <div style="background: url(../../../static/images/slider/slider-image-1.jpg) no-repeat; background-size: cover; border-radius: 0.5rem">
-                   <div class="ps-lg-12 py-lg-16 col-xxl-7 col-lg-9 py-14 px-8 text-xs-center">
+                <div class="slide-up" style="background: url(../../../static/images/slider/slider-image-1.jpg) no-repeat; background-size: cover; border-radius: 0.5rem">
+                   <div class="ps-lg-12 py-lg-16 col-xxl-7 col-lg-9 py-14 px-8 text-xs-center" style="font-family: 'Arial', sans-serif;">
                       <!-- badge -->
                       <div class="d-flex align-items-center mb-4">
                          <span>Exclusive Offer</span>
@@ -155,7 +158,7 @@
                       <div class="mb-4 mt-4">
                          <span class="text-dark">
                             Start from
-                            <span class="fs-4 text-danger ms-1">$5.99</span>
+                            <span class="fs-4 text-danger ms-1">₱5.99</span>
                          </span>
                       </div>
                       <!-- btn -->
@@ -166,8 +169,8 @@
                    </div>
                 </div>
                 <!-- img -->
-                <div style="background: url(../../../static/images/slider/slider-image-2.jpg) no-repeat; background-size: cover; border-radius: 0.5rem">
-                   <div class="ps-lg-12 py-lg-16 col-xxl-7 col-lg-9 py-14 ps-8 text-xs-center">
+                <div class="slide-up" style="background: url(../../../static/images/slider/slider-image-2.jpg) no-repeat; background-size: cover; border-radius: 0.5rem">
+                   <div class="ps-lg-12 py-lg-16 col-xxl-7 col-lg-9 py-14 ps-8 text-xs-center" style="font-family: 'Arial', sans-serif;">
                       <!-- badge -->
                       <div class="d-flex align-items-center mb-4">
                          <span>Exclusive Offer</span>
@@ -181,19 +184,19 @@
                       <div class="mb-4 mt-4">
                          <span class="text-dark">
                             Start from
-                            <span class="fs-4 text-danger ms-1">$34.99</span>
+                            <span class="fs-4 text-danger ms-1">₱34.99</span>
                          </span>
                       </div>
                       <!-- btn -->
-                      <a href="#!" class="btn btn-primary">
+                      <a href="{% url 'chat:home' %}" class="btn btn-primary">
                          Shop Deals Now
                          <i class="feather-icon icon-arrow-right ms-1"></i>
                       </a>
                    </div>
                 </div>
                 <!-- img -->
-                <div style="background: url(../../../static/images/slider/slider-image-3.jpg) no-repeat; background-size: cover; border-radius: 0.5rem">
-                   <div class="ps-lg-12 py-lg-16 col-xxl-7 col-lg-9 py-14 ps-8 text-xs-center">
+                <div class="slide-up" style="background: url(../../../static/images/slider/slider-image-3.jpg) no-repeat; background-size: cover; border-radius: 0.5rem">
+                   <div class="ps-lg-12 py-lg-16 col-xxl-7 col-lg-9 py-14 ps-8 text-xs-center" style="font-family: 'Arial', sans-serif;">
                       <!-- badge -->
                       <div class="d-flex align-items-center mb-4">
                          <span>Exclusive Offer</span>
@@ -206,11 +209,11 @@
                       <div class="mb-4 mt-4">
                          <span class="text-dark">
                             Start from
-                            <span class="fs-4 text-primary ms-1">$5.99</span>
+                            <span class="fs-4 text-primary ms-1">₱5.99</span>
                          </span>
                       </div>
                       <!-- btn -->
-                      <a href="#!" class="btn btn-primary">
+                      <a href="{% url 'chat:home' %}" class="btn btn-primary">
                          Shop This Week Offer
                          <i class="feather-icon icon-arrow-right ms-1"></i>
                       </a>
@@ -219,27 +222,27 @@
              </div>
           </div>
           <div class="col-xxl-4 col-xl-5 col-12 d-lg-flex d-xl-block gap-3 gap-xl-0">
-             <div class="flex-fill px-8 py-9 mb-6 rounded" style="background: url(../../../static/images/banner/ad-banner-1.jpg) no-repeat; background-size: cover">
-                <div>
+             <div class="slide-up flex-fill px-8 py-9 mb-6 rounded" style="background: url(../../../static/images/banner/ad-banner-1.jpg) no-repeat; background-size: cover">
+                <div style="font-family: 'Arial', sans-serif;">
                    <h3 class="mb-0 fw-bold">
                       10% cashback on
                       <br />
                       personal care
                    </h3>
                    <div class="mt-4 mb-5 fs-5">
-                      <p class="mb-0">Max cashback: $12</p>
+                      <p class="mb-0">Max cashback: ₱12</p>
                       <span>
                          Code:
                          <span class="fw-bold text-dark">CARE12</span>
                       </span>
                    </div>
-                   <a href="#" class="btn btn-dark">Shop Now</a>
+                   <a href="{% url 'chat:home' %}" class="btn btn-dark">Shop Now</a>
                 </div>
              </div>
 
-             <div class="flex-fill px-8 py-8 rounded" style="background: url(../../../static/images/banner/ad-banner-2.jpg) no-repeat; background-size: cover">
+             <div class="slide-up flex-fill px-8 rounded" style="background: url(../../../static/images/banner/ad-banner-2.jpg) no-repeat; background-size: cover;">
                 <!-- Banner Content -->
-                <div>
+                <div style="font-family: 'Arial', sans-serif; padding-bottom: 5px;">
                    <!-- Banner Content -->
                    <h3 class="fw-bold mb-3">
                       Say yes to
@@ -253,17 +256,18 @@
                          the fruity way
                       </p>
                    </div>
-
                    <a href="#" class="btn btn-dark">Shop Now</a>
                 </div>
              </div>
+
+
           </div>
        </div>
     </div>
  </section>
 
-   <section class="mb-lg-10 mt-lg-14 my-8">
-      <div class="container">
+   <section class="slide-up mb-lg-10 mt-lg-14 my-8">
+      <div class="container" style="font-family: 'Arial', sans-serif;">
          <div class="row">
             <div class="col-12 mb-6">
                <h3 class="mb-0">Featured Categories</h3>
@@ -272,8 +276,10 @@
          <div class="category-slider">
             {% for category in categories %}
             <div class="category-card">
-               <img src="{{ category.category_image_url }}" alt="{{ category.name }}" class="mb-3" />
-               <h5 class="text-dark">{{ category.name }}</h5>
+               <a href="{% url 'products:show_products_category' category.id %}">
+                  <img src="{{ category.category_image_url }}" alt="{{ category.name }}" class="mb-3" />
+                  <h5 class="text-dark">{{ category.name }}</h5>
+               </a>
             </div>
             {% endfor %}
          </div>
@@ -282,12 +288,12 @@
 
    <!--Discount section-->
    <section>
-      <div class="container">
+      <div class="slide-up container">
          <div class="row">
             <div class="col-12 col-md-6 mb-3 mb-lg-0">
                <div>
                   <div class="py-10 px-8 rounded" style="background: url(../../../static/images/banner/grocery-banner.png) no-repeat; background-size: cover; background-position: center">
-                     <div>
+                     <div style="font-family: 'Arial', sans-serif;">
                         <h3 class="fw-bold mb-1">Fruits & Vegetables</h3>
                         <p class="mb-4">
                            Get Upto
@@ -302,7 +308,7 @@
             <div class="col-12 col-md-6">
                <div>
                   <div class="py-10 px-8 rounded" style="background: url(../../../static/images/banner/grocery-banner-2.jpg) no-repeat; background-size: cover; background-position: center">
-                     <div>
+                     <div style="font-family: 'Arial', sans-serif;">
                         <h3 class="fw-bold mb-1">Freshly Baked Buns</h3>
                         <p class="mb-4">
                            Get Upto
@@ -320,9 +326,9 @@
 
    <!-- Popular Products Start-->
    <section class="my-lg-14 my-8">
-      <div class="container">
+      <div class="container slide-up">
          <div class="row">
-            <div class="col-12 mb-6">
+            <div class="col-12 mb-6" style="font-family: 'Arial', sans-serif;">
                <h3 class="mb-0">Popular Products</h3>
             </div>
          </div>
@@ -332,7 +338,7 @@
                <div class="card card-product">
                   <div class="card-body">
                      <div class="text-center position-relative">
-                        <div class="position-absolute top-0 start-0">
+                        <div class="position-absolute top-0 start-0" style="font-family: 'Arial', sans-serif;">
                            <div class="availability">
                               {% if products.product_stock >= 1 %}
                                  <small class="text-white" style="background-color: #00b200; border-radius: 5px; padding: 2px;">available</small>
@@ -351,8 +357,8 @@
                            <img src="{{products.product_image_url}}" alt="Grocery Ecommerce Template" class="mb-3 img-fluid product-image" />
                         </a>
                      </div>
-                     <h2 class="fs-6"><a href="pages/shop-single.html" class="text-inherit text-decoration-none">{{products.product_name}}</a></h2>
-                     <div class="d-flex justify-content-between align-items-center mt-3">
+                     <h2  style="font-family: 'Arial', sans-serif;" class="fs-6"><a href="pages/shop-single.html" class="text-inherit text-decoration-none">{{products.product_name}}</a></h2>
+                     <div class="d-flex justify-content-between align-items-center mt-3" style="font-family: 'Arial', sans-serif;">
                         <div>
                            <span class="text-dark">₱{{products.product_price}} per {{products.product_measurement}}</span>
                         </div>
@@ -374,9 +380,9 @@
 
    <!--new arri-->
     <section>
-      <div class="container">
+      <div class="container slide-up">
          <div class="row">
-            <div class="col-md-12 mb-6">
+            <div class="col-md-12 mb-6" style="font-family: 'Arial', sans-serif;">
                <h3 class="mb-0"><b> New Arrivals</b></h3>
             </div>
          </div>
@@ -387,7 +393,7 @@
                   <div class="card card-product">
                      <div class="card-body">
                         <div class="text-center position-relative">
-                           <div class="position-absolute top-0 start-0">
+                           <div class="position-absolute top-0 start-0" style="font-family: 'Arial', sans-serif;">
                               {% if products.product_stock >= 1 %}
                                  <small class="text-white" style="background-color: #00b200; border-radius: 5px; padding: 2px;">Available</small>
                               {% else %}
@@ -404,12 +410,12 @@
                               <img src="{{products.product_image_url}}" alt="Grocery Ecommerce Template" class="mb-3 img-fluid product-image" />
                            </a>
                         </div>
-                        <h2 class="fs-6"><a href="pages/shop-single.html" class="text-inherit text-decoration-none">{{products.product_name}}</a></h2>
+                        <h2 class="fs-6"><a href="pages/shop-single.html" class="text-inherit text-decoration-none" style="font-family: 'Arial', sans-serif;">{{products.product_name}}</a></h2>
                         <div class="d-flex justify-content-between align-items-center mt-3">
-                           <div>
+                           <div style="font-family: 'Arial', sans-serif;">
                               <span class="text-dark">₱{{products.product_price}} per {{products.product_measurement}}</span>
                            </div>
-                           <div>
+                           <div style="font-family: 'Arial', sans-serif;">
                               <form action="{% url 'products:order_details' products.id %}" method="POST">
                                  {% csrf_token %}
                                  <button style="padding-left: 10px; padding-right: 10px; background-color: #00b200;" type="submit" class="btn text-white"><b>Buy</b></button>
@@ -424,82 +430,25 @@
          </div>
       </div>
    </section>
-   <!-- <section>
-      <div class="container">
-         <div class="row">
-            <div class="col-md-12 mb-6">
-               <h3 class="mb-0"><b> New Arrivals</b></h3>
-            </div>
-         </div>
-         <div class="table-responsive-lg pb-6">
-            <div class="row row-cols-lg-4 row-cols-1 row-cols-md-2 g-4 flex-nowrap">
-
-               {% for products in new_arrivals %}
-               <div class="col">
-                  <div class="card card-product">
-                     <div class="card-body">
-                        <div class="text-center position-relative">
-                           <div class="position-absolute top-0 start-0">
-                              {% if products.product_stock >= 1 %}
-                                 <small class="text-white" style="background-color: #00b200; border-radius: 5px; padding: 2px;">available</small>
-                              {% else %}
-                                 <small>unavailable</small>
-                              {% endif %}
-                              <form style="margin-left: 0px;" action="{% url 'products:add_to_wishlist' products.id %}" method="POST">
-                                 {% csrf_token %}
-                                 <button style="border-radius: 20px; margin: 0; border-color: #00b200;">
-                                    <i style="font-size: 15px;" class="bi bi-heart"></i> 
-                                 </button>
-                              </form>
-                           </div>
-                           <a href="{% url 'products:view_product' products.id %}"><img width="250px" height="400px" src="{{products.product_image_url}}" alt="Grocery Ecommerce Template" class="mb-3 img-fluid" /></a>
-                        </div>
-                        <div class="text-small mb-1">
-                           <a href="#!" class="text-decoration-none text-muted"><small>category: {{products.product_category}}</small></a>
-                        </div>
-                        <h2 class="fs-6"><a href="pages/shop-single.html" class="text-inherit text-decoration-none">{{products.product_name}}</a></h2>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                           <div>
-                              <span class="text-dark">₱{{products.product_price}} per {{products.product_measurement}}</span>
-                           </div>
-                           <div>
-                           <form action="{% url 'products:order_details' products.id %}" method="POST">
-                                 {% csrf_token %}
-                                 <button style="padding-left: 10px; padding-right: 10px; background-color: #00b200;;" type="submit" class="btn text-white"><b>Buy</b></button>
-                           </form>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-                  </a>
-               </div>
-               {% endfor %}
-
-            </div>
-         </div>
-      </div>
-   </section> -->
-
-
    <section class="my-lg-14 my-8">
-      <div class="container">
+      <div class="container slide-up">
          <div class="row row-cols-lg-3 row-cols-md-3 row-cols-1 g-4">
             <div class="col">
-               <div class="card h-100 text-center p-4">
+               <div class="card h-100 text-center p-4" style="font-family: 'Arial', sans-serif;">
                   <div class="mb-4"><img src="{% static 'images/icons/clock.svg' %}" alt="" /></div>
                   <h3 class="h5 mb-3">10 minute grocery now</h3>
                   <p>Get your order delivered to your doorstep at the earliest from FreshCart pickup stores near you.</p>
                </div>
             </div>
             <div class="col">
-               <div class="card h-100 text-center p-4">
+               <div class="card h-100 text-center p-4" style="font-family: 'Arial', sans-serif;">
                   <div class="mb-4"><img src="{% static 'images/icons/gift.svg' %}" alt="" /></div>
                   <h3 class="h5 mb-3">Best Prices & Offers</h3>
                   <p>Cheaper prices than your local supermarket, great cashback offers to top it off. Get best prices & offers.</p>
                </div>
             </div>
             <div class="col">
-               <div class="card h-100 text-center p-4">
+               <div class="card h-100 text-center p-4" style="font-family: 'Arial', sans-serif;">
                   <div class="mb-4"><img src="{% static 'images/icons/refresh-cw.svg' %}" alt="" /></div>
                   <h3 class="h5 mb-3">Easy Returns</h3>
                   <p>Not satisfied with a product? Return it at the doorstep & get a refund within hours. No questions asked <a href="#">policy</a>.</p>
@@ -701,6 +650,6 @@
 <script src="{% static 'libs/tiny-slider/dist/min/tiny-slider.js' %}"></script>
 <script src="{% static 'js/vendors/tns-slider.js' %}"></script>
 <script src="{% static 'js/vendors/zoom.js' %}"></script>
-
+<script src="{% static 'js/slideup.js' %}"></script>
 
 {% endblock %}      

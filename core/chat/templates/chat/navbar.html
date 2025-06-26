@@ -71,6 +71,13 @@
         color: white !important;
     }
 
+    @media (max-width: 720px) {
+        #landing-search{
+            width: 200px;
+            height: 40px;
+        }
+
+    }
     </style>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 </head>  
@@ -89,8 +96,9 @@
                     <h3 class="ms-2 mb-0 fw-bold text-dark" style="font-family: 'Itim', cursive;">E-Kubo</h3>
                 </a>
             {% endif %}
+
             <!-- Toggle Button for Mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" id="navbar-toggler">
                 <span class="navbar-toggler-icon"></span>
             </button>
     
@@ -100,24 +108,14 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if request.user.business %}
                     {% else %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="storeDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <li class="nav-item dropdown" style="font-family: 'Arial', sans-serif;">
+                        <a class="nav-link" href="{% url 'shops:shops_list' %}"  aria-expanded="false">
                             Stores
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="storeDropdown">
-                            <a class="dropdown-item" href="{% url 'shops:shops_list' %}">
-                                All Stores
-                            </a>
-                            {% for shop in stores %}
-                            <a href="{% url 'shops:view_shop' shop.id %}" class="text-decoration-none">
-                                <li class="dropdown-item">{{shop.business_name}}</li>
-                            </a>
-                            {% endfor %}
-                        </ul>
                     </li>  
     
                     <!-- Pages Dropdown -->
-                    <li class="nav-item dropdown"> 
+                    <li class="nav-item dropdown" style="font-family: 'Arial', sans-serif;"> 
                         <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-bs-toggle="dropdown">Pages</a>
                         
                         <ul class="dropdown-menu">
@@ -154,34 +152,22 @@
                     {% else %}
                         <form method="GET" action="{% url 'chat:home' %}" class="d-flex ms-3">
                             <input class="form-control" type="search" name="q" placeholder="Search for products..." aria-label="Search"
-                                style="height: 45px;">
-                            <button class="btn btn-success" type="submit" style="height: 45px;">Search</button>
+                                style="height: 40px;">
+                            <button class="btn btn-success" type="submit" style="height: 40px; font-family: Arial, sans-serif;">Search</button>
                         </form>
                     {% endif %}
                 {% else %}
-                <!-- <form method="GET" action="{% url 'chat:home' %}" class="d-flex ms-3">
-                    <input class="form-control" type="search" name="q" placeholder="Search for products..." aria-label="Search"
-                        style="height: 45px; width: 500px;" >
-                    <button class="btn btn-success" type="submit" style="height: 45px;">Search</button>
-                </form>
-                <div>
-                    <a href="{% url 'chat:signup' %}">
-                    <button style="border-radius: 20px;" type="submit">signup</button>
-                    </a>
-                </div> -->
-                <div class="d-flex w-100 justify-content-between align-items-center">
+                <div class="d-flex w-100 justify-content-center align-items-center" style="font-family: 'Arial', sans-serif;"> 
                     <form method="GET" action="{% url 'chat:home' %}" class="d-flex ms-3">
-                        <input class="form-control" type="search" name="q" placeholder="Search for products..." aria-label="Search"
-                            style="height: 45px; width: 500px;">
-                        <button class="btn btn-success" type="submit" style="height: 45px;">Search</button>
+                        <input id="landing-search" class="form-control searchh" type="search" name="q" placeholder="Search for products..." aria-label="Search">
+                        <button class="btn btn-success" type="submit" style="height: 40px;">Search</button>
                     </form>
-                    <div class="ms-auto">
+                    <div class="ms-auto ">
                         <a href="{% url 'chat:login' %}">
-                            <button style="border-radius: 20px;" type="submit">Sign in</button>
+                            <button style="border-radius: 20px; padding: 5px; padding-left: 10px; padding-right: 10px;" type="submit">Sign in</button>
                         </a>
                     </div>
                 </div>
-                
                 {% endif %}
             </div>
         </div>
@@ -189,6 +175,22 @@
     
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const navbarToggler = document.getElementById("navbar-toggler");
+            const navbarNav = document.getElementById("navbarNav");
+
+            navbarToggler.addEventListener("click", function () {
+                navbarNav.classList.toggle("show");
+            });
+
+            // Close navbar when clicking outside
+            document.addEventListener("click", function (event) {
+                if (!navbarNav.contains(event.target) && !navbarToggler.contains(event.target)) {
+                    navbarNav.classList.remove("show");
+                }
+            });
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             const sidebar = document.getElementById("sidebar");
             const overlay = document.getElementById("overlay");

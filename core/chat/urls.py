@@ -24,6 +24,8 @@ urlpatterns = [
     path('mark_messages_read/', views.mark_messages_read, name='mark_messages_read'),
     path('about/', views.about_page, name='about'),
     path('error-page/', views.error_page, name='error'),
+    path('verify/', views.verify_user, name='verify_user'),
+    path('reset/new-password/', views.set_new_password, name='set_new_password'),
 ]
 
 

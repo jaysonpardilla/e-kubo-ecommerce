@@ -1,54 +1,97 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Notifications</title>
+  {% block title %}
+    <title>E-Kubo: Notifications</title>
+  {% endblock title %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{% static 'icons/ekubo_icon.png' %}">
+  <link rel="stylesheet" href="{% static 'css/slideup.css' %}">
+  <style>
+    /* Responsive Styling */
+    @media (max-width: 768px) {
+      h5 {
+        font-size: 18px;
+      }
+      table {
+        font-size: 14px;
+      }
+    }
+    @media (max-width: 420px) {
+      h5 {
+        font-size: 16px;
+      }
+      table {
+        font-size: 12px;
+      }
+    }
 
+    /* Centering Search Bar */
+    .dataTables_filter {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
   {% include 'chat/navbar.html' %}
   
-  <div class="container">
-    <h5 class="text-center mt-5"><b>Notifications</b></h5>
-    <table id="notificationsTable" class="display" style="outline: 1px solid black">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Content</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for notification in read_notifications %}
-        <tr>
-          <td>{{ notification.created_at }}</td>
-          <td>{{ notification.message }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="2">No past notifications.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="container slide-up">
+    <h5 class="text-center mt-4" style="font-family: 'Arial', sans-serif;"><b>Notifications</b></h5>
+
+    <!-- Search Bar -->
+    <div class="text-center mb-3">
+      <input type="text" id="searchInput" class="form-control w-50 mx-auto" placeholder="Search notifications...">
+    </div>
+
+    <div class="table-responsive">
+      <table id="notificationsTable" class="table table-bordered table-striped">
+        <thead class="table-dark" style="font-family: 'Arial', sans-serif;">
+          <tr>
+            <th>Date</th>
+            <th>Content</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for notification in read_notifications %}
+          <tr style="font-family: 'Arial', sans-serif;">
+            <td>{{ notification.created_at }}</td>
+            <td>{{ notification.message }}</td>
+          </tr>
+          {% empty %}
+          <tr style="font-family: 'Arial', sans-serif;">
+            <td colspan="2" class="text-center">No past notifications.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
   
   {% include 'chat/footer.html' %}
   
   <script>
     $(document).ready(function() {
-      $('#notificationsTable').DataTable({
+      var table = $('#notificationsTable').DataTable({
         "paging": true,
-        "searching": true,
         "ordering": true,
+        "searching": false  // Disable default search box
+      });
+
+      // Custom Search Functionality
+      $('#searchInput').on('keyup', function() {
+        table.search(this.value).draw();
       });
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+  <script src="{% static 'js/slideup.js' %}"></script>
 </body>
 </html>

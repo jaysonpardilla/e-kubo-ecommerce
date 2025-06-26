@@ -73,6 +73,7 @@
 
     </style>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="icon" type="image/png" href="{% static 'icons/ekubo_icon.png' %}">
 </head>  
 <body>
     <nav class="navbar navbar-expand-lg px-3 shadow-sm" style="background-color: white; position: sticky; top: 0; z-index: 1030;">
@@ -88,7 +89,7 @@
             </button>
     
             <!-- Navbar Items -->
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNav" style="font-family: 'Arial', sans-serif;">
                 {% if user.is_authenticated %} 
                 <ul class="navbar-nav ms-auto align-items-center">
                     <!-- Notification -->

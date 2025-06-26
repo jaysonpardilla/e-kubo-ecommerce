@@ -30,20 +30,13 @@ def update_shop(request, pk):
 
 @login_required(login_url='/login/')
 def view_shop(request, pk):
-    # Get the shop instance by its primary key (pk)
     shop = get_object_or_404(Business, pk=pk)
-    
-    # Filter products by the shop's business ID
     products = Product.objects.filter(seller=shop)
-    
-    # Count the total number of products
     total_products = products.count()
-    
-    # Get the currently logged-in user
     user = request.user
     query = request.GET.get('q', '')
     results = Product.objects.filter(product_name__icontains=query) if query else []
-    # Pass the data to the context
+
     context = {
         'shop': shop,
         'product': products,
@@ -52,7 +45,6 @@ def view_shop(request, pk):
         'query':query,
         'results':results,
     }
-    
     return render(request, 'shops/view-shop.html', context)
 
 

@@ -5,7 +5,7 @@ from .forms import ProductForm, BusinessForm, ReviewForm, AddCategory
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Wishlist, Product, Order, Review
+from .models import Wishlist, Product, Order, Review,Category
 from django.contrib.auth.decorators import login_required
 from uuid import UUID
 from django.contrib import messages
@@ -28,6 +28,7 @@ def add_category(request):
         form = AddCategory(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            messages.info(request, 'new category added')
             return redirect(reverse('manage_business:home'))  
     else:
         form = AddCategory()
@@ -39,29 +40,15 @@ def add_new_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            product = form.save(commit=False)  # Don't save yet
-            product.seller = request.user.business  # Assign the logged-in user's business
-            product.save()  # Now save with the seller
+            product = form.save(commit=False) 
+            product.seller = request.user.business 
+            product.save()  
             messages.success(request, "Product added successfully!")
             return redirect('manage_business:home')  
     else:
         form = ProductForm()
-    
     return render(request, 'products/add_product.html', {'form': form})
 
-@login_required
-def edit_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id, seller=request.user.business)  # Ensure the seller owns the product
-    if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Product updated successfully!")
-            return redirect('product_list')  # Redirect to product list or details
-    else:
-        form = ProductForm(instance=product)
-
-    return render(request, 'products/edit_products.html', {'form': form, 'product': product})
 
 @login_required(login_url='/login/')
 def createBusiness(request):
@@ -74,16 +61,16 @@ def createBusiness(request):
             business.user = request.user
             business.save()
             print('valid form')
+            messages.success(request, 'new store successfully created')
             return redirect(reverse('manage_business:home'))
         else:
             print('invalid form')
     context = {'form':form}
     return render(request, 'products/create-business.html', context)
 
-#@login_required(login_url='/login/')
 def view_product(request, id):
     single_product = get_object_or_404(Product, pk=id)
-    reviews = single_product.reviews.all()  # Get all reviews for the product
+    reviews = single_product.reviews.all()  
     form = ReviewForm(request.POST or None)
 
     if form.is_valid() and request.user.is_authenticated:
@@ -92,10 +79,7 @@ def view_product(request, id):
         review.user = request.user
         review.save()
 
-    # Calculate average rating
     average_rating = single_product.average_rating
-
-    # Get related products
     keywords = single_product.product_name.split()
     query = Q()
     for word in keywords:
@@ -107,7 +91,7 @@ def view_product(request, id):
         'related_product': related,
         'reviews': reviews,
         'form': form,
-        'average_rating': average_rating,  # Pass average rating to the template
+        'average_rating': average_rating,  
     }
     return render(request, 'products/view-product.html', context)
 
@@ -115,7 +99,6 @@ def view_product(request, id):
 def order_details(request, product_id):
     single_product = get_object_or_404(Product, pk=product_id)
     related_products = Product.objects.filter(product_name__icontains=single_product.product_name).exclude(id=single_product.id)
-
     shop = get_object_or_404(Business, pk=single_product.seller.id)
 
     context = {
@@ -123,27 +106,35 @@ def order_details(request, product_id):
         'related_products':related_products,
         'shop':shop,
     }
-    return render(request, 'products/order_details.html', context)
-
+    return render(request, 'products/old-order_details.html', context)
 
 @login_required(login_url='/login/')
 def place_order(request, product_id):
     product = Product.objects.get(id=product_id)
-    seller = product.seller.user  # Ensure this points to the seller
+    seller = product.seller.user  
     order_quantity = request.POST.get('quantity')
     print('Quantity: '+str(order_quantity))
     order = Order.objects.create(product=product, order_quantity=order_quantity ,buyer=request.user, status="Pending")
-    # Notify seller
+
     Notification.objects.create(
         user=seller,
         message=f"You have a new order for {product.product_name} from {request.user.first_name} {request.user.last_name}. quantity {order_quantity}"
     )
+    messages.info(request, 'order placed successfully!')
     return redirect(reverse("products:success_purchase"))
-
 
 @login_required(login_url='/login/')
 def success_purchase(request):
     return render(request, 'products/order_sucess.html')
 
-
+def show_products_category(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    products = category.products.all()
+    all_products = products.count()
+    context = {
+        'category':category,
+        'products':products,
+        'all_products':all_products,
+    }
+    return render(request, 'products/view_category_product.html', context)
 

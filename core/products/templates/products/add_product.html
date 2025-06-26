@@ -1,4 +1,10 @@
 {% extends 'chat/base.html' %}
+{% load static %}
+{% block title %}
+   <title>E-Kubo: Add new product</title>
+{% endblock title %}
+<link rel="icon" type="image/png" href="{% static 'icons/ekubo_icon.png' %}">
+<link rel="stylesheet" href="{% static 'css/slideup.css' %}">
 {% block content %}
 <style>
     input[type="file"] {
@@ -7,12 +13,12 @@
 
 </style>
 
-<div class="container mt-5">
+<div class="container mt-5 slide-up">
     <div class="col-md-"></div>
     <div class="col-md-6">
-    <div class="card shadow-lg p-4">
-        <h2 class="text-center mb-4">Add New Product</h2>
-        <form method="POST" enctype="multipart/form-data" id="productForm">
+    <div class="card shadow-lg p-4" style="font-family: 'Arial', sans-serif;">
+        <h2 class="text-center mb-4" style="font-family: 'Arial', sans-serif;">Add New Product</h2>
+        <form method="POST" enctype="multipart/form-data" id="productForm" style="font-family: 'Arial', sans-serif;">
             {% csrf_token %}
             <div class="mb-3">
                 <label class="form-label">Product Name</label>
@@ -74,6 +80,7 @@
 <div class="mb-5">
 
 </div>
+<script src="{% static 'js/slideup.js' %}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         function previewImage(input, previewElement) {

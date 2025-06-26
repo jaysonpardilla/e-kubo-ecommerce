@@ -15,8 +15,15 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from products.models import Order
-from products.models import Category, Product, Business, Wishlist
+from products.models import Category, Product, Business, Wishlist, Review
 import random
+from django.db.models import Max, Q
+import requests
+from .capture_image import capture_image
+from .email_utils import send_email_with_image
+from django.utils.timezone import now
+from .forms import VerifyUserForm, SetNewPasswordForm
+from uuid import UUID
 User = get_user_model()
 
 
@@ -27,10 +34,20 @@ def signup(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
-        
-        # Handle checkbox: If checked, it sends 'on', otherwise it's not present
-        is_seller = 'yes' if request.POST.get('is_seller') else 'no'
+        recaptcha_response = request.POST.get("g-recaptcha-response")
 
+        data = {
+            "secret": "6LfndgYrAAAAAKfMxiRbV0BI0pqvEHHkqyWRYRKO",
+            "response": recaptcha_response
+        }
+        google_url = "https://www.google.com/recaptcha/api/siteverify"
+        response = requests.post(google_url, data=data)
+        result = response.json()
+
+        if not result.get("success"):
+            messages.error(request, "reCAPTCHA verification failed. Please try again.")
+            return redirect(reverse("chat:signup"))
+        
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
             return redirect(reverse('chat:signup'))
@@ -49,7 +66,6 @@ def signup(request):
             last_name=last_name,
             email=email,
             password=password,
-            is_seller=is_seller
         )
         user.save()
         messages.success(request, "Account created successfully. Please log in.")
@@ -57,25 +73,46 @@ def signup(request):
     
     return render(request, 'chat/temp-signup.html')
 
+FAILED_ATTEMPTS = {}
 def login_view(request):
     if request.method == 'POST':
-        
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request, username=email, password=password)
+        
         if user is not None:
             login(request, user)
+            user.failed_attempts = 1
+            user.last_failed_attempt = None
+            user.save()
+
             if Business.objects.filter(user=user).exists():
+                messages.success(request, 'Welcome back! ' + str(user.first_name))
                 return redirect(reverse('manage_business:home'))
             else:
+                messages.success(request, 'Welcome back! ' + str(user.first_name))
                 return redirect(reverse('chat:home'))
         else:
+            try:
+                user = User.objects.get(email=email)
+                user.failed_attempts += 1
+                user.last_failed_attempt = now()
+
+                if user.failed_attempts >=3 :
+                    image_path = capture_image()
+                    send_email_with_image(user, image_path)
+                    user.failed_attempts = 0 
+                    messages.warning(request, "Too many failed attempts.")
+                user.save()
+            except User.DoesNotExist:
+                messages.error(request, "Invalid email or password.")
+                return redirect(reverse('chat:login'))
             messages.error(request, "Invalid email or password.")
             return redirect(reverse('chat:login'))
     return render(request, 'chat/temp_login.html')
 
 def landingPage(request):
-    products = Product.objects.order_by('?')[:10]
+    products = Product.objects.order_by('?')
     categories = Category.objects.order_by('?')
     query = request.GET.get('q', '')
     results = Product.objects.filter(product_name__icontains=query) if query else []
@@ -98,17 +135,39 @@ def home(request):
     unread_notifications = Notification.objects.filter(user=request.user, is_read=False).count()
     categories = Category.objects.all()
     query = request.GET.get('q', '')
+    reviews = Review.objects.all().order_by('-created_at')[:3]
     results = Product.objects.filter(product_name__icontains=query) if query else []
     new_arrivals = Product.objects.all().order_by("-created_at")[:4]
-    
+
+    purchased_categories = Product.objects.filter(
+        order__buyer=request.user,
+        order__status__in=["Accepted", "Pending"]
+    ).values_list('product_category', flat=True).distinct()
+
+    # if purchased_categories:
+    #     recommended_products = Product.objects.filter(
+    #         product_category__in=purchased_categories
+    #     ).exclude(order__buyer=request.user).order_by('?')
+    # else:
+    #     recommended_products = Product.objects.all().order_by("?")[:10]
+    if purchased_categories:
+        recommended_products = Product.objects.filter(
+            product_category__in=purchased_categories
+        ).exclude(order__buyer=request.user).order_by('?')
+    else:
+        recommended_products = Product.objects.none()
+
+
     context = {
-        'query':query,
-        'products':products,
-        'has_business':users_with_business,
-        'results':results,
+        'query': query,
+        'products': products,
+        'has_business': users_with_business,
+        'results': results,
         'unread_notifications': unread_notifications,
-        'categories':categories,
-        'new_arrivals':new_arrivals
+        'categories': categories,
+        'new_arrivals': new_arrivals,
+        'reviews': reviews,
+        'recommended_products': recommended_products
     }
     return render(request, 'chat/home.html', context)
 
@@ -120,70 +179,11 @@ def error_page(request):
 def about_page(request):
     return render(request, 'chat/about.html')
 
-# @login_required(login_url='/login/')
-# def conversation(request, chat_id=None):
-#     from django.db.models import Max, Q
-
-#     # Filter users to include only those with whom the logged-in user has a conversation
-#     users = User.objects.filter(
-#         Q(received_messages__sender=request.user) | Q(sent_messages__receiver=request.user)
-#     ).distinct()
-
-#     # Annotate each user with the latest message timestamp
-#     users = users.annotate(
-#         latest_message_time=Max(
-#             'received_messages__timestamp',
-#             filter=Q(received_messages__sender=request.user) | Q(sent_messages__receiver=request.user)
-#         )
-#     ).order_by('-latest_message_time')
-
-#     # Search functionality
-#     search_query = request.GET.get('search_user')
-#     if search_query:
-#         users = users.filter(first_name__icontains=search_query)
-
-#     # Chat logic
-#     current_user = None
-#     messages = []
-#     last_messages = {}
-#     if chat_id:
-#         current_user = get_object_or_404(User, id=chat_id)
-#         if request.method == 'POST':
-#             content = request.POST.get('content')
-#             if content:
-#                 Message.objects.create(sender=request.user, receiver=current_user, content=content)
-
-#         # Fetch messages between the logged-in user and the selected user
-#         messages = Message.objects.filter(
-#             Q(sender=request.user, receiver=current_user) | Q(sender=current_user, receiver=request.user)
-#         ).order_by('timestamp')
-
-#     # Retrieve the last message for each user
-#     for user in users:
-#         last_message = Message.objects.filter(
-#             Q(sender=request.user, receiver=user) | Q(sender=user, receiver=request.user)
-#         ).order_by('-timestamp').first()
-#         last_messages[user.id] = last_message
-
-#     context = {
-#         'users': users,
-#         'user_profile': users,
-#         'current_user': current_user,
-#         'messages': messages,
-#         'last_message': last_messages,
-#     }
-
-#     return render(request, 'chat/conversation.html', context)
-
 @login_required(login_url='/login/')
 def conversation(request, chat_id=None):
-    from django.db.models import Max, Q
-    from django.utils.timezone import now
-
     users = User.objects.filter(
         Q(received_messages__sender=request.user) | Q(sent_messages__receiver=request.user)
     ).distinct()
-
     users = users.annotate(
         latest_message_time=Max(
             'received_messages__timestamp',
@@ -196,24 +196,27 @@ def conversation(request, chat_id=None):
         users = users.filter(first_name__icontains=search_query)
 
     current_user = None
+    if chat_id:
+        current_user = get_object_or_404(User, id=chat_id)
+    elif users.exists():
+        current_user = random.choice(users)
+
     messages = []
     last_messages = {}
 
-    if chat_id:
-        current_user = get_object_or_404(User, id=chat_id)
+    if current_user:
         if request.method == 'POST':
             content = request.POST.get('content')
             if content:
                 Message.objects.create(sender=request.user, receiver=current_user, content=content)
 
+                if not current_user.profile.is_online():
+                    auto_message = "Hello! I'm currently offline. I'll get back to you soon."
+                    Message.objects.create(sender=current_user, receiver=request.user, content=auto_message)
+
         messages = Message.objects.filter(
             Q(sender=request.user, receiver=current_user) | Q(sender=current_user, receiver=request.user)
         ).order_by('timestamp')
-
-        # Check if user is offline and send an auto-message
-        if not current_user.profile.is_online():
-            auto_message = "Hello! I'm currently offline. I'll get back to you soon."
-            Message.objects.create(sender=current_user, receiver=request.user, content=auto_message)
 
     for user in users:
         last_message = Message.objects.filter(
@@ -230,7 +233,6 @@ def conversation(request, chat_id=None):
     }
 
     return render(request, 'chat/conversation.html', context)
-
 
 @login_required(login_url='/login/')
 def get_unread_messages_count(request):
@@ -276,8 +278,6 @@ def profile_detail(request):
     order_history = Order.objects.filter(buyer = user)
     unread_notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
     read_notifications = Notification.objects.filter(user=request.user, is_read=True).order_by('-created_at')
-
-    # Mark unread notifications as read
     unread_notifications.update(is_read=True)
 
     context = { 
@@ -301,6 +301,7 @@ def update_user(request, id):
         form = UpdateUser(request.POST, instance=instance)
         if form.is_valid():
             form.save()
+            messages.info(request, 'successfully updated' )
             return redirect(reverse('chat:profile_detail'))
     else:
         form = UpdateUser(instance=instance)
@@ -311,39 +312,64 @@ def update_user(request, id):
 @login_required(login_url='/login/')
 def mark_notifications_read(request):
     if request.method == "POST":
-        # Fetch unread notifications
         notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
-        
-        # Get notification data for the response
         notifications_list = list(notifications.values("id", "message", "created_at"))
-
-        # Mark notifications as read
         notifications.update(is_read=True)
 
-        # Return the notifications and success message
         return JsonResponse({"message": "Notifications marked as read", "notifications": notifications_list})
-
     return JsonResponse({"error": "Invalid request"}, status=400)
 
-
-@login_required
+@login_required(login_url='/login/')
 def get_notifications(request):
     notifications = Notification.objects.filter(user=request.user, is_read=False)
     return JsonResponse({"count": notifications.count()})
 
-@login_required
+@login_required(login_url='/login/')
 def buyer_notification(request):
     unread_notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
     read_notifications = Notification.objects.filter(user=request.user, is_read=True).order_by('-created_at')
     
-    # Mark unread notifications as read
     unread_notifications.update(is_read=True)
-
     return render(request, "chat/buyer_notification.html", {
         "unread_notifications": unread_notifications,
         "read_notifications": read_notifications
     })
 
+@login_required(login_url='/login/')
+def verify_user(request):
+    if request.method == 'POST':
+        form = VerifyUserForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=email, password=password)
+            if user:
+                request.session['verified_user_id'] = str(user.id)
+                return redirect(reverse('chat:set_new_password'))
+            else:
+                form.add_error(None, "Invalid email or password")
+    else:
+        form = VerifyUserForm()
+    return render(request, 'chat/verify_user.html', {'form': form})
 
+@login_required(login_url='/login/')
+def set_new_password(request):
+    user_id = request.session.get('verified_user_id')
+    if not user_id:
+        return redirect('verify_user')
 
+    user = User.objects.get(id=UUID(user_id))
+
+    if request.method == 'POST':
+        form = SetNewPasswordForm(request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password']
+            user.set_password(new_password)
+            user.save()
+            del request.session['verified_user_id']
+            messages.success(request, 'password successfully updated')
+            return redirect(reverse('chat:login'))  
+    else:
+        form = SetNewPasswordForm()
+    return render(request, 'chat/set_new_password.html', {'form': form})
 

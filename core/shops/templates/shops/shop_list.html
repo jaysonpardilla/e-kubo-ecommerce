@@ -1,9 +1,21 @@
 {% extends 'chat/base.html' %}
 {% load static %}
+{% block title %}
+   <title>E-Kubo: Shops</title>
+{% endblock title %}
+<link rel="stylesheet" href="{% static 'css/slideup.css' %}">
 {% block content %}
+<style>
+   @media (min-width: 480px) and (max-width: 768px) {
+    .col {
+        flex: 0 0 50%; /* Each column takes 50% width */
+        max-width: 50%;
+    }
+}
+</style>
 <main>
    <!-- section -->
-   <section class="mt-8">
+   <section class="mt-8 slide-up">
       <!-- container -->
       <div class="container">
          <!-- row -->
@@ -12,7 +24,7 @@
                <!-- heading -->
                <div class="bg-light d-flex justify-content-between ps-md-10 ps-6 rounded">
                   <div class="d-flex align-items-center">
-                     <h1 class="mb-0 fw-bold">Stores</h1>
+                     <h1 class="mb-0 fw-bold" style="font-family: 'Arial', sans-serif;">Stores</h1>
                   </div>
                   <div class="py-6">
                      <!-- img -->
@@ -33,7 +45,7 @@
             <div class="col-12">
                <div class="mb-3">
                   <!-- text -->
-                  <h6>
+                  <h6 style="font-family: 'Arial', sans-serif;">
                      We have
                      <span class="text-primary">{{total_shop}}</span>
                      vendors now
@@ -41,28 +53,31 @@
                </div>
             </div>
          </div>
-         <div class="row row-cols-1 row-cols-lg-4 row-cols-md-3 g-4 g-lg-4">
+         <!-- <div class="row row-cols-1 row-cols-lg-4 row-cols-md-3 g-4 g-lg-4"> -->
+         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 g-lg-4">
+
             {% for shop in shop %}
             <div class="col">
                <!-- card -->
                <div class="card p-6 card-product">
                   <div style="display: flex; justify-content: center; align-items: center;">
                      <img style="height: 70px; width: 90px; border-radius: 10px; box-shadow: 1px 1px 2px rgb(85, 85, 85);" src="{{ shop.business_image_url }}" alt="" />
-                 </div>
+                  </div>
                  
-                  <div class="mt-4">
+                  <div class="mt-4" style="font-family: 'Arial', sans-serif;">
                      <!-- content -->
-                     <h2 class="mb-1 h5"><a href="#!" class="text-inherit">{{ shop.business_name }}</a></h2>
+                     <h2 class="mb-1 h5"><a href="{% url 'shops:view_shop' shop.id %}" class="text-inherit">{{ shop.business_name }}</a></h2>
                      <div class="small text-muted">
  
                         <p class="me-2">{{shop.business_description}}</p>
                         <p>message owner: <a style="color: rgb(62, 62, 205);" href="{% url 'chat:chat_with' shop.user.id %}">message</a>
                         </p> 
                      </div>
-                     <div class="py-3">
+                     <div class="py-3" style="font-family: 'Arial', sans-serif;">
                         <ul class="list-unstyled mb-0 small">
-                           <li>Delivery</li>
-                           <li>Pickup available</li>
+                           <p class="mb-0"><b>Shipping:</b></p>
+                           <li>- Delivery</li>
+                           <li>- Pickup</li>
                         </ul>
                      </div>
                      <div>
@@ -77,4 +92,5 @@
       </div>
    </section>
 </main>
+<script src="{% static 'js/slideup.js' %}"></script>
 {% endblock %}

@@ -14,6 +14,8 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     phone = models.BigIntegerField(null=True, blank=True)
     is_seller = models.CharField(max_length=45, choices=[('yes', 'yes'), ('no', 'no')])
+    failed_attempts = models.IntegerField(default=0)
+    last_failed_attempt = models.DateTimeField(null=True, blank=True)
     groups = models.ManyToManyField(
         Group,
         related_name='customuser_set',  # specify a custom related_name
@@ -37,24 +39,6 @@ class Message(models.Model):
     def __str__(self):
         return f"{self.content}"
 
-
-# class Profile(models.Model):
-#     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     profile = models.ImageField(upload_to='user_profiles', default='default.png')
-#     province = models.CharField(max_length=100, null=True, blank=True)
-#     municipality = models.CharField(max_length=100, null=True, blank=True)
-#     street = models.CharField(max_length=200,  null=True, blank=True)
-#     postal_code = models.CharField(max_length=20,  null=True, blank=True)
-
-    
-#     def __str__(self):
-#         return f"{self.user.username} - {self.street if self.street else 'No Address'}"
-    
-#     def profile_image_url(self):
-#         try: 
-#             url = self.profile.url
-#         except:
-#             url = ''
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     profile = models.ImageField(upload_to='user_profiles', default='default.png')
@@ -65,10 +49,11 @@ class Profile(models.Model):
     last_seen = models.DateTimeField(null=True, blank=True)
 
     def is_online(self):
-        """ Check if the user was active within the last 5 minutes """
+        """ Check if the user was active within the last 1 second """
         if self.last_seen:
             return (now() - self.last_seen).total_seconds() < 300  
-    
+            # return (now() - self.last_seen).total_seconds() < 1
+        
     def __str__(self):
         return f"{self.user.username} - {self.street if self.street else 'No Address'}"
     
